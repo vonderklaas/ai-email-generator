@@ -1,0 +1,26 @@
+---
+export const prerender = false;
+
+import BaseLayout from "@/layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="AI Email Generator for SaaS — DigiStorms"
+  description="Generate ready-to-ship SaaS emails with AI, then refine them in chat."
+>
+  <main class="min-h-screen bg-background-warm px-6 py-20">
+    <section class="mx-auto max-w-3xl rounded-3xl bg-white p-10 text-center shadow-soft">
+      <p class="mb-4 text-sm font-semibold uppercase tracking-[0.14em] text-primary">DigiStorms free tool</p>
+      <h1 class="font-serif text-5xl leading-tight text-slate-950">AI emails for SaaS, free</h1>
+      <p class="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-600">
+        Prompt your first draft, refine it in chat, and export production-ready HTML or MJML.
+      </p>
+      <a
+        href="/ai-email-generator"
+        class="mt-8 inline-flex min-h-12 items-center rounded-full bg-primary px-6 font-semibold text-white transition hover:bg-blue-700"
+      >
+        Open the generator
+      </a>
+    </section>
+  </main>
+</BaseLayout>
