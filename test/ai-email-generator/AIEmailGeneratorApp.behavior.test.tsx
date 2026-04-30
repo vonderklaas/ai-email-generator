@@ -299,7 +299,7 @@ describe("AIEmailGeneratorApp", () => {
 
     // Switch to HTML source mode
     fireEvent.click(screen.getByRole("button", { name: /^HTML$/i }));
-    expect(screen.getByText(/<html>/i)).toBeInTheDocument();
+    expect(screen.getByText(/<html/i)).toBeInTheDocument();
 
     // Refine once to enable reset, then reset
     const chatBox = screen.getAllByRole("textbox")[0];

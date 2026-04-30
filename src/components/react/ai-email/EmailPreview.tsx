@@ -1,4 +1,5 @@
 import type { CurrentEmail, PreviewMode } from "./types";
+import { HighlightedCode } from "./HighlightedCode";
 import { Button } from "@/components/ui/button";
 
 type Props = {
@@ -71,7 +72,9 @@ export function EmailPreview({ email, mode, onModeChange, onCompilePreview, comp
       ) : (
         <div className="max-h-[640px] overflow-auto rounded-2xl bg-slate-950">
           <pre className="min-w-0 max-w-full overflow-x-auto p-5 text-xs leading-6 text-slate-100">
-            <code className="whitespace-pre">{mode === "html" ? (email.html ?? "") : email.mjml}</code>
+            <code className="whitespace-pre">
+              <HighlightedCode code={mode === "html" ? (email.html ?? "") : email.mjml} />
+            </code>
           </pre>
         </div>
       )}

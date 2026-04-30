@@ -34,10 +34,10 @@ describe("EmailPreview", () => {
   it("renders HTML and MJML source modes", () => {
     const email = { subject: "S", preheader: "P", mjml: "<mjml/>", html: "<html><body>ok</body></html>" as string | null };
     const { rerender } = render(<EmailPreview email={email} mode="html" onModeChange={() => {}} />);
-    expect(screen.getByText(/<html>/i)).toBeInTheDocument();
+    expect(screen.getByText(/<html/i)).toBeInTheDocument();
 
     rerender(<EmailPreview email={email} mode="mjml" onModeChange={() => {}} />);
-    expect(screen.getByText(/<mjml\/>/i)).toBeInTheDocument();
+    expect(screen.getByText(/<mjml/i)).toBeInTheDocument();
   });
 
   it("does not show compile actions when onCompilePreview is not provided", () => {
