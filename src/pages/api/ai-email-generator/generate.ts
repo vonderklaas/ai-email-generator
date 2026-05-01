@@ -3,6 +3,7 @@ import { compileMjmlSafe } from "@/lib/ai-email/mjml";
 import { generateEmail } from "@/lib/ai-email/openai";
 import { checkRateLimit, getClientIp } from "@/lib/ai-email/rateLimit";
 import { generateRequestSchema } from "@/lib/ai-email/schemas";
+import { applyResolvedCtaColorToMjml, resolveCtaBackgroundColor } from "@/lib/ai-email/brandColors";
 import { fetchSiteContext, normalizePublicUrl } from "@/lib/ai-email/siteContext";
 import { errorResponse, jsonResponse } from "@/lib/ai-email/http";
 
@@ -27,17 +28,26 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     const siteContext = await fetchSiteContext(parsed.data.companyUrl || undefined);
     const logoUrl = normalizePublicUrl(parsed.data.logoUrl || undefined)?.href ?? siteContext?.ogImage;
+    const ctaBackgroundColor = resolveCtaBackgroundColor(
+      siteContext?.themeColor,
+      siteContext?.scrapedAccentHex,
+    );
     const output = await generateEmail(parsed.data.prompt, {
       companyUrl: siteContext?.url ?? (parsed.data.companyUrl || undefined),
       logoUrl,
       title: siteContext?.title,
       description: siteContext?.description,
       themeColor: siteContext?.themeColor,
+      scrapedAccentHex: siteContext?.scrapedAccentHex,
+      ctaBackgroundColor,
+      socialUrls: siteContext?.socialUrls,
     });
-    const compiled = await compileMjmlSafe(output.mjml);
+    const mjml = applyResolvedCtaColorToMjml(output.mjml, ctaBackgroundColor);
+    const compiled = await compileMjmlSafe(mjml);
 
     return jsonResponse({
       ...output,
+      mjml,
       html: compiled.html,
       /* c8 ignore next */
       warnings: import.meta.env.DEV ? compiled.warnings : undefined,

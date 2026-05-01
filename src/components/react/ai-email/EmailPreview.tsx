@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { CurrentEmail, PreviewMode } from "./types";
 import { HighlightedCode } from "./HighlightedCode";
 import { Button } from "@/components/ui/button";
+import { injectPreviewBaseTargetBlank } from "@/lib/previewHtml";
 
 type Props = {
   email: CurrentEmail;
@@ -70,8 +71,8 @@ export function EmailPreview({ email, mode, onModeChange, onCompilePreview, comp
             <iframe
               key={email.html}
               title="Email preview"
-              sandbox="allow-same-origin"
-              srcDoc={email.html}
+              sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+              srcDoc={injectPreviewBaseTargetBlank(email.html)}
               onLoad={(event) => handleIframeLoad(event.currentTarget)}
               style={{ height: iframeHeight }}
               className="mx-auto w-full max-w-[640px] rounded-xl border border-slate-200 bg-white"

@@ -65,6 +65,25 @@ describe("/api/ai-email-generator/generate", () => {
     expect(json.html).toContain("<html>");
   });
 
+  it("applies resolved CTA color to MJML before compile", async () => {
+    vi.mocked(generateEmail).mockResolvedValueOnce({
+      subject: "Welcome",
+      preheader: "Preheader",
+      mjml:
+        '<mjml><mj-body><mj-section><mj-column><mj-button background-color="#ffffff" color="#FFFFFF" href="https://example.com">Go</mj-button></mj-column></mj-section></mj-body></mjml>',
+    });
+
+    const request = new Request("http://localhost/api", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ prompt: "Welcome email for a SaaS product." }),
+    });
+
+    await POST(ctx(request));
+    const passedMjml = vi.mocked(compileMjmlSafe).mock.calls.at(-1)?.[0] as string;
+    expect(passedMjml).toContain('background-color="#000000"');
+  });
+
   it("returns 429 when rate limited", async () => {
     vi.mocked(checkRateLimit).mockReturnValueOnce({
       allowed: false,

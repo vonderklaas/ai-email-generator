@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { fetchSiteContext, normalizePublicUrl } from "@/lib/ai-email/siteContext";
+import { extractSocialUrlsFromHtml, fetchSiteContext, normalizePublicUrl } from "@/lib/ai-email/siteContext";
 
 describe("siteContext", () => {
   beforeEach(() => {
@@ -49,6 +49,71 @@ describe("siteContext", () => {
     await expect(fetchSiteContext("http://localhost")).resolves.toBe(null);
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false }));
     await expect(fetchSiteContext("https://acme.test")).resolves.toEqual({ url: "https://acme.test/" });
+  });
+
+  it("extracts social URLs from hrefs and JSON-LD sameAs", () => {
+    const base = new URL("https://acme.test/");
+    const html = `
+      <a href="/pricing">Pricing</a>
+      <a href="https://twitter.com/acmeco">X</a>
+      <a href="https://github.com/acmeco/app">GitHub</a>
+      <script type="application/ld+json">
+        {"@context":"https://schema.org","sameAs":["https://www.linkedin.com/company/acme","https://twitter.com/acmeco"]}
+      </script>
+    `;
+    expect(extractSocialUrlsFromHtml(html, base)).toEqual([
+      "https://twitter.com/acmeco",
+      "https://github.com/acmeco/app",
+      "https://www.linkedin.com/company/acme",
+    ]);
+  });
+
+  it("accepts YouTube channel, @handle, and watch URLs but not generic paths", () => {
+    const base = new URL("https://example.com/");
+    const html = `
+      <a href="https://youtube.com/feed">feed</a>
+      <a href="https://youtube.com/channel/UCabc123">ch</a>
+      <a href="https://youtube.com/@MyBrand">h</a>
+      <a href="https://youtube.com/watch?v=xyz">w</a>
+    `;
+    expect(extractSocialUrlsFromHtml(html, base)).toEqual([
+      "https://youtube.com/channel/UCabc123",
+      "https://youtube.com/@MyBrand",
+      "https://youtube.com/watch?v=xyz",
+    ]);
+  });
+
+  it("fetchSiteContext sets scrapedAccentHex when theme is white but brand colors repeat in HTML", async () => {
+    const blueSpans = Array(15)
+      .fill(null)
+      .map(() => '<span style="color:#048CDD">x</span>')
+      .join("");
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        text: async () => `<html><head>
+            <meta name="theme-color" content="#ffffff"/>
+            ${blueSpans}
+          </head><body></body></html>`,
+      }),
+    );
+    const context = await fetchSiteContext("https://acme.test");
+    expect(context?.themeColor).toBe("#ffffff");
+    expect(context?.scrapedAccentHex).toBe("#048CDD");
+  });
+
+  it("fetchSiteContext includes socialUrls when present in HTML", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        text: async () =>
+          `<html><body><a href="https://x.com/acme_ai">Follow</a><a href="mailto:a@b.com">Email</a></body></html>`,
+      }),
+    );
+    const context = await fetchSiteContext("https://acme.test");
+    expect(context?.socialUrls).toEqual(["https://x.com/acme_ai"]);
   });
 });
 

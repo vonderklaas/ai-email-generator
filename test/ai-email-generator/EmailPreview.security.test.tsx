@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { EmailPreview } from "@/components/react/ai-email/EmailPreview";
+import { injectPreviewBaseTargetBlank } from "@/lib/previewHtml";
 
 const email = {
   subject: "Welcome aboard",
@@ -15,8 +16,11 @@ describe("EmailPreview security", () => {
 
     const iframe = screen.getByTitle("Email preview");
 
-    expect(iframe).toHaveAttribute("srcDoc", email.html);
-    expect(iframe).toHaveAttribute("sandbox", "allow-same-origin");
+    expect(iframe).toHaveAttribute("srcDoc", injectPreviewBaseTargetBlank(email.html));
+    expect(iframe).toHaveAttribute(
+      "sandbox",
+      "allow-same-origin allow-popups allow-popups-to-escape-sandbox",
+    );
     expect(iframe.getAttribute("sandbox")).not.toContain("allow-scripts");
     expect(iframe.getAttribute("sandbox")).not.toContain("allow-forms");
   });

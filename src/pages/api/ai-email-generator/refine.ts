@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { coercePrimaryCtaIfIllegible } from "@/lib/ai-email/brandColors";
 import { compileMjmlSafe } from "@/lib/ai-email/mjml";
 import { sseEvent } from "@/lib/ai-email/http";
 import { refineEmail } from "@/lib/ai-email/openai";
@@ -56,10 +57,12 @@ export const POST: APIRoute = async ({ request }) => {
         });
 
         send("progress", { message: "Compiling the updated MJML preview..." });
-        const compiled = await compileMjmlSafe(output.mjml);
+        const mjml = coercePrimaryCtaIfIllegible(output.mjml);
+        const compiled = await compileMjmlSafe(mjml);
 
         send("complete", {
           ...output,
+          mjml,
           html: compiled.html,
           /* c8 ignore next */
           warnings: import.meta.env.DEV ? compiled.warnings : undefined,
