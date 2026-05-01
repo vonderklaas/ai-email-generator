@@ -31,6 +31,24 @@ describe("EmailPreview", () => {
     expect(screen.getByTitle(/email preview/i)).toBeInTheDocument();
   });
 
+  it("auto-sizes iframe to email content height", () => {
+    render(
+      <EmailPreview
+        email={{ subject: "S", preheader: "P", mjml: "<mjml/>", html: "<html><body>ok</body></html>" }}
+        mode="rendered"
+        onModeChange={() => {}}
+      />,
+    );
+
+    const iframe = screen.getByTitle(/email preview/i) as HTMLIFrameElement;
+    Object.defineProperty(iframe.contentDocument?.documentElement, "scrollHeight", {
+      value: 500,
+      configurable: true,
+    });
+    fireEvent.load(iframe);
+    expect(iframe.style.height).toBe("500px");
+  });
+
   it("renders HTML and MJML source modes", () => {
     const email = { subject: "S", preheader: "P", mjml: "<mjml/>", html: "<html><body>ok</body></html>" as string | null };
     const { rerender } = render(<EmailPreview email={email} mode="html" onModeChange={() => {}} />);

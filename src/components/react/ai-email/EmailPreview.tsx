@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { CurrentEmail, PreviewMode } from "./types";
 import { HighlightedCode } from "./HighlightedCode";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,24 @@ const MODES: Array<{ id: PreviewMode; label: string }> = [
 ];
 
 export function EmailPreview({ email, mode, onModeChange, onCompilePreview, compilingPreview }: Props) {
+  const [iframeHeight, setIframeHeight] = useState(420);
+
+  const resizeIframe = (iframe: HTMLIFrameElement | null) => {
+    if (!iframe?.contentDocument) return;
+    const { body, documentElement } = iframe.contentDocument;
+
+    const height = Math.max(
+      documentElement.scrollHeight,
+      body.scrollHeight,
+      documentElement.offsetHeight,
+      body.offsetHeight,
+    );
+
+    if (height > 0) {
+      setIframeHeight(Math.min(Math.max(height, 320), 900));
+    }
+  };
+
   return (
     <section className="min-w-0 rounded-[2rem] border border-slate-200 bg-white p-4 shadow-soft lg:p-6">
       <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -46,7 +65,9 @@ export function EmailPreview({ email, mode, onModeChange, onCompilePreview, comp
               title="Email preview"
               sandbox="allow-same-origin"
               srcDoc={email.html}
-              className="mx-auto h-[560px] w-full max-w-[640px] rounded-xl border border-slate-200 bg-white"
+              onLoad={(event) => resizeIframe(event.currentTarget)}
+              style={{ height: iframeHeight }}
+              className="mx-auto w-full max-w-[640px] rounded-xl border border-slate-200 bg-white"
             />
           ) : (
             <div className="mx-auto flex h-[420px] w-full max-w-[640px] items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white px-8 text-center">
