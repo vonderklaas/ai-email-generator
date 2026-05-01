@@ -108,7 +108,7 @@ export function LandingPrompt({
           {generating ? "Generating draft..." : "Generate email"}
         </Button>
         <p className="mt-4 text-center text-xs text-slate-400">
-          Primitive abuse protection is enabled. No account required.
+          No account required.
         </p>
       </div>
     </section>

@@ -18,7 +18,7 @@ const MODES: Array<{ id: PreviewMode; label: string }> = [
 ];
 
 export function EmailPreview({ email, mode, onModeChange, onCompilePreview, compilingPreview }: Props) {
-  const [iframeHeight, setIframeHeight] = useState(420);
+  const [iframeHeight, setIframeHeight] = useState(320);
 
   const resizeIframe = (iframe: HTMLIFrameElement | null) => {
     if (!iframe?.contentDocument) return;
@@ -32,8 +32,14 @@ export function EmailPreview({ email, mode, onModeChange, onCompilePreview, comp
     );
 
     if (height > 0) {
-      setIframeHeight(Math.min(Math.max(height, 320), 900));
+      setIframeHeight(Math.min(Math.max(height, 280), 900));
     }
+  };
+
+  const handleIframeLoad = (iframe: HTMLIFrameElement) => {
+    resizeIframe(iframe);
+    iframe.contentWindow?.requestAnimationFrame(() => resizeIframe(iframe));
+    window.setTimeout(() => resizeIframe(iframe), 250);
   };
 
   return (
@@ -62,10 +68,11 @@ export function EmailPreview({ email, mode, onModeChange, onCompilePreview, comp
         <div className="overflow-auto rounded-2xl bg-slate-100 p-4">
           {email.html ? (
             <iframe
+              key={email.html}
               title="Email preview"
               sandbox="allow-same-origin"
               srcDoc={email.html}
-              onLoad={(event) => resizeIframe(event.currentTarget)}
+              onLoad={(event) => handleIframeLoad(event.currentTarget)}
               style={{ height: iframeHeight }}
               className="mx-auto w-full max-w-[640px] rounded-xl border border-slate-200 bg-white"
             />
