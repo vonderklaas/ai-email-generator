@@ -12,6 +12,8 @@ export const generatedEmailSchema = emailOutputSchema.extend({
 
 export const generateRequestSchema = z.object({
   prompt: z.string().trim().min(10).max(2000),
+  companyUrl: z.string().trim().url().max(500).optional().or(z.literal("")),
+  logoUrl: z.string().trim().url().max(500).optional().or(z.literal("")),
 });
 
 export const chatMessageSchema = z.object({

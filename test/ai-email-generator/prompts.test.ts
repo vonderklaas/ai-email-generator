@@ -6,6 +6,20 @@ describe("prompts", () => {
     expect(generationUserPrompt("hello")).toContain("hello");
   });
 
+  it("generationUserPrompt includes brand context when provided", () => {
+    const out = generationUserPrompt("hello", {
+      companyUrl: "https://acme.test",
+      logoUrl: "https://acme.test/logo.png",
+      title: "Acme",
+      description: "Better onboarding",
+      themeColor: "#123456",
+    });
+
+    expect(out).toContain("Company website: https://acme.test");
+    expect(out).toContain("Company logo URL: https://acme.test/logo.png");
+    expect(out).toContain("Brand/theme color: #123456");
+  });
+
   it("refinementUserPrompt includes fields", () => {
     const out = refinementUserPrompt({
       originalPrompt: "orig",

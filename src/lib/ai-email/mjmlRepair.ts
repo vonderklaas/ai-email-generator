@@ -67,7 +67,7 @@ export function repairMjml(mjml: string): { mjml: string; repaired: boolean } {
 
   // Best-effort closure for common truncation: if we have opening mj tags but missing closers, append them.
   // This is intentionally naive, but it rescues many mid-output truncations.
-  const requiredClosers = ["</mj-button>", "</mj-column>", "</mj-section>", "</mj-body>", "</mjml>"] as const;
+  const requiredClosers = ["</mj-image>", "</mj-button>", "</mj-column>", "</mj-section>", "</mj-body>", "</mjml>"] as const;
   if (next.includes("<mjml") && next.includes("<mj-body")) {
     for (const closer of requiredClosers) {
       if (!next.includes(closer)) {

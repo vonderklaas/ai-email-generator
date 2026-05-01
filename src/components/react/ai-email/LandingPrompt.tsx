@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
 const EXAMPLES = [
@@ -11,12 +12,25 @@ const EXAMPLES = [
 
 type Props = {
   prompt: string;
+  companyUrl: string;
+  logoUrl: string;
   generating: boolean;
   onPromptChange: (prompt: string) => void;
+  onCompanyUrlChange: (url: string) => void;
+  onLogoUrlChange: (url: string) => void;
   onGenerate: () => void;
 };
 
-export function LandingPrompt({ prompt, generating, onPromptChange, onGenerate }: Props) {
+export function LandingPrompt({
+  prompt,
+  companyUrl,
+  logoUrl,
+  generating,
+  onPromptChange,
+  onCompanyUrlChange,
+  onLogoUrlChange,
+  onGenerate,
+}: Props) {
   const [exampleIndex, setExampleIndex] = useState(0);
   const tooShort = prompt.trim().length > 0 && prompt.trim().length < 10;
   const tooLong = prompt.length > 2000;
@@ -59,12 +73,31 @@ export function LandingPrompt({ prompt, generating, onPromptChange, onGenerate }
           </div>
         </div>
         <Textarea
+          aria-label="Email brief"
           value={prompt}
           onChange={(event) => onPromptChange(event.target.value)}
           placeholder={EXAMPLES[exampleIndex]}
           className="min-h-52 resize-none text-base"
           disabled={generating}
         />
+        <div className="mt-4 grid gap-3">
+          <Input
+            aria-label="Company website URL"
+            value={companyUrl}
+            onChange={(event) => onCompanyUrlChange(event.target.value)}
+            placeholder="Company website URL (optional, for tone + brand colors)"
+            disabled={generating}
+            type="url"
+          />
+          <Input
+            aria-label="Logo URL"
+            value={logoUrl}
+            onChange={(event) => onLogoUrlChange(event.target.value)}
+            placeholder="Logo URL (optional, hosted image)"
+            disabled={generating}
+            type="url"
+          />
+        </div>
         <div className="mt-3 flex items-center justify-between text-xs">
           <span className={tooShort || tooLong ? "text-red-600" : "text-slate-500"}>
             {tooLong ? "Prompt must be 2000 characters or less." : tooShort ? "Use at least 10 characters." : "10-2000 characters"}

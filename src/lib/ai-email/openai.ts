@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import { SYSTEM_PROMPT, generationUserPrompt, refinementUserPrompt } from "./prompts";
+import { SYSTEM_PROMPT, generationUserPrompt, refinementUserPrompt, type BrandContext } from "./prompts";
 import { emailOutputSchema, openAIJsonSchema, type EmailOutput } from "./schemas";
 
 let client: OpenAI | null = null;
@@ -72,9 +72,9 @@ async function createStructuredEmail(
   return parseContent(choice?.message?.content ?? null);
 }
 
-export async function generateEmail(prompt: string): Promise<EmailOutput> {
+export async function generateEmail(prompt: string, brand?: BrandContext): Promise<EmailOutput> {
   const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
-    { role: "user", content: generationUserPrompt(prompt) },
+    { role: "user", content: generationUserPrompt(prompt, brand) },
   ];
   return withOneRetry(
     () => createStructuredEmail(messages),

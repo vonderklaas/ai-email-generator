@@ -56,11 +56,13 @@ function AppInner() {
   useEffect(() => {
     persistDraft({
       prompt: state.prompt,
+      companyUrl: state.companyUrl,
+      logoUrl: state.logoUrl,
       originalPrompt: state.originalPrompt,
       currentEmail: state.currentEmail,
       messages: state.messages,
     });
-  }, [state.prompt, state.originalPrompt, state.currentEmail, state.messages]);
+  }, [state.prompt, state.companyUrl, state.logoUrl, state.originalPrompt, state.currentEmail, state.messages]);
 
   const generate = async () => {
     dispatch({ type: "startGenerate" });
@@ -71,7 +73,11 @@ function AppInner() {
       const response = await fetch("/api/ai-email-generator/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: state.prompt }),
+        body: JSON.stringify({
+          prompt: state.prompt,
+          companyUrl: state.companyUrl.trim() || undefined,
+          logoUrl: state.logoUrl.trim() || undefined,
+        }),
         signal: controller.signal,
       });
       const payload = await response.json().catch(() => null);
@@ -269,8 +275,12 @@ function AppInner() {
           )}
           <LandingPrompt
             prompt={state.prompt}
+              companyUrl={state.companyUrl}
+              logoUrl={state.logoUrl}
             generating={state.generating}
             onPromptChange={(prompt) => dispatch({ type: "setPrompt", prompt })}
+              onCompanyUrlChange={(companyUrl) => dispatch({ type: "setCompanyUrl", companyUrl })}
+              onLogoUrlChange={(logoUrl) => dispatch({ type: "setLogoUrl", logoUrl })}
             onGenerate={generate}
           />
         </main>

@@ -22,6 +22,8 @@ const chatMessageSchema = z.object({
 const draftSchema = z.object({
   version: z.literal(DRAFT_SCHEMA_VERSION),
   prompt: z.string(),
+  companyUrl: z.string().optional().default(""),
+  logoUrl: z.string().optional().default(""),
   originalPrompt: z.string(),
   currentEmail: currentEmailSchema.nullable(),
   messages: z.array(chatMessageSchema),
@@ -53,7 +55,7 @@ export function restoreDraft(storage: Storage = window.localStorage): PersistedD
 }
 
 export function persistDraft(
-  state: Pick<AIEmailState, "prompt" | "originalPrompt" | "currentEmail" | "messages">,
+  state: Pick<AIEmailState, "prompt" | "companyUrl" | "logoUrl" | "originalPrompt" | "currentEmail" | "messages">,
   storage: Storage = window.localStorage,
 ): void {
   if (!state.currentEmail) return;
@@ -61,6 +63,8 @@ export function persistDraft(
   const payload: PersistedDraft = {
     version: DRAFT_SCHEMA_VERSION,
     prompt: state.prompt,
+    companyUrl: state.companyUrl,
+    logoUrl: state.logoUrl,
     originalPrompt: state.originalPrompt,
     currentEmail: state.currentEmail,
     messages: state.messages.map((message) => ({
@@ -86,12 +90,16 @@ export function clearDraft(storage: Storage = window.localStorage): void {
 
 export function draftToState(draft: PersistedDraft): {
   prompt: string;
+  companyUrl: string;
+  logoUrl: string;
   originalPrompt: string;
   currentEmail: CurrentEmail | null;
   messages: ChatMessage[];
 } {
   return {
     prompt: draft.prompt,
+    companyUrl: draft.companyUrl,
+    logoUrl: draft.logoUrl,
     originalPrompt: draft.originalPrompt,
     currentEmail: draft.currentEmail,
     messages: draft.messages,

@@ -2,6 +2,8 @@ import type { AIEmailState, AppError, ChatMessage, CurrentEmail, PreviewMode, Ra
 
 export const initialState: AIEmailState = {
   prompt: "",
+  companyUrl: "",
+  logoUrl: "",
   originalPrompt: "",
   generating: false,
   refining: false,
@@ -16,6 +18,8 @@ export const initialState: AIEmailState = {
 export type AIEmailAction =
   | { type: "restore"; payload: Partial<AIEmailState> }
   | { type: "setPrompt"; prompt: string }
+  | { type: "setCompanyUrl"; companyUrl: string }
+  | { type: "setLogoUrl"; logoUrl: string }
   | { type: "setPreviewMode"; previewMode: PreviewMode }
   | { type: "startGenerate" }
   | { type: "generateSuccess"; email: CurrentEmail; originalPrompt: string; rateLimit: RateLimitState }
@@ -37,6 +41,10 @@ export function aiEmailReducer(state: AIEmailState, action: AIEmailAction): AIEm
       return { ...state, ...action.payload, generating: false, refining: false, error: null, rateLimitBlock: null };
     case "setPrompt":
       return { ...state, prompt: action.prompt, error: null, rateLimitBlock: null };
+    case "setCompanyUrl":
+      return { ...state, companyUrl: action.companyUrl, error: null };
+    case "setLogoUrl":
+      return { ...state, logoUrl: action.logoUrl, error: null };
     case "setPreviewMode":
       return { ...state, previewMode: action.previewMode };
     case "startGenerate":

@@ -46,10 +46,10 @@ export function EmailPreview({ email, mode, onModeChange, onCompilePreview, comp
               title="Email preview"
               sandbox="allow-same-origin"
               srcDoc={email.html}
-              className="mx-auto h-[640px] w-full max-w-[640px] rounded-xl border border-slate-200 bg-white"
+              className="mx-auto h-[560px] w-full max-w-[640px] rounded-xl border border-slate-200 bg-white"
             />
           ) : (
-            <div className="mx-auto flex h-[640px] w-full max-w-[640px] items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white px-8 text-center">
+            <div className="mx-auto flex h-[420px] w-full max-w-[640px] items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white px-8 text-center">
               <div>
                 <p className="text-sm font-semibold text-slate-900">Preview unavailable</p>
                 <p className="mt-2 text-sm text-slate-500">

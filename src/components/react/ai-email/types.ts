@@ -36,6 +36,8 @@ export type AppError = {
 
 export type AIEmailState = {
   prompt: string;
+  companyUrl: string;
+  logoUrl: string;
   originalPrompt: string;
   generating: boolean;
   refining: boolean;

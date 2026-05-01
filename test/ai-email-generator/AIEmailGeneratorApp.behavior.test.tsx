@@ -44,20 +44,33 @@ describe("AIEmailGeneratorApp", () => {
   });
 
   it("generates an email and enters workspace", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ subject: "S", preheader: "P", mjml: "<mjml/>", html: "<html/>", usage: { remaining: null } }),
+    });
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({ subject: "S", preheader: "P", mjml: "<mjml/>", html: "<html/>", usage: { remaining: null } }),
-      }),
+      fetchMock,
     );
 
     render(<App />);
 
-    fireEvent.change(screen.getByRole("textbox"), { target: { value: "Welcome email for SaaS users." } });
+    fireEvent.change(screen.getByLabelText(/email brief/i), { target: { value: "Welcome email for SaaS users." } });
+    fireEvent.change(screen.getByLabelText(/company website url/i), { target: { value: "https://acme.test" } });
+    fireEvent.change(screen.getByLabelText(/logo url/i), { target: { value: "https://acme.test/logo.png" } });
     fireEvent.click(screen.getByRole("button", { name: /generate email/i }));
 
     await waitFor(() => expect(screen.getByText(/refine in chat/i)).toBeInTheDocument());
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/ai-email-generator/generate",
+      expect.objectContaining({
+        body: JSON.stringify({
+          prompt: "Welcome email for SaaS users.",
+          companyUrl: "https://acme.test",
+          logoUrl: "https://acme.test/logo.png",
+        }),
+      }),
+    );
   });
 
   it("shows error toast on generate failure", async () => {
@@ -70,7 +83,7 @@ describe("AIEmailGeneratorApp", () => {
     );
 
     render(<App />);
-    fireEvent.change(screen.getByRole("textbox"), { target: { value: "Welcome email for SaaS users." } });
+    fireEvent.change(screen.getByLabelText(/email brief/i), { target: { value: "Welcome email for SaaS users." } });
     fireEvent.click(screen.getByRole("button", { name: /generate email/i }));
 
     await waitFor(() => expect(screen.getByText(/generation failed/i)).toBeInTheDocument());
@@ -86,7 +99,7 @@ describe("AIEmailGeneratorApp", () => {
     );
 
     render(<App />);
-    fireEvent.change(screen.getByRole("textbox"), { target: { value: "Welcome email for SaaS users." } });
+    fireEvent.change(screen.getByLabelText(/email brief/i), { target: { value: "Welcome email for SaaS users." } });
     fireEvent.click(screen.getByRole("button", { name: /generate email/i }));
     await waitFor(() => expect(screen.getByText(/refine in chat/i)).toBeInTheDocument());
 
@@ -107,7 +120,7 @@ describe("AIEmailGeneratorApp", () => {
     );
 
     render(<App />);
-    fireEvent.change(screen.getByRole("textbox"), { target: { value: "Welcome email for SaaS users." } });
+    fireEvent.change(screen.getByLabelText(/email brief/i), { target: { value: "Welcome email for SaaS users." } });
     fireEvent.click(screen.getByRole("button", { name: /generate email/i }));
 
     await waitFor(() => expect(screen.getByText(/preview unavailable/i)).toBeInTheDocument());
@@ -129,7 +142,7 @@ describe("AIEmailGeneratorApp", () => {
     };
 
     render(<App />);
-    fireEvent.change(screen.getByRole("textbox"), { target: { value: "Welcome email for SaaS users." } });
+    fireEvent.change(screen.getByLabelText(/email brief/i), { target: { value: "Welcome email for SaaS users." } });
     fireEvent.click(screen.getByRole("button", { name: /generate email/i }));
     await waitFor(() => expect(screen.getByText(/your draft is ready/i)).toBeInTheDocument());
 
@@ -148,7 +161,7 @@ describe("AIEmailGeneratorApp", () => {
     vi.mocked(postSse).mockRejectedValueOnce(new Error("bad"));
 
     render(<App />);
-    fireEvent.change(screen.getByRole("textbox"), { target: { value: "Welcome email for SaaS users." } });
+    fireEvent.change(screen.getByLabelText(/email brief/i), { target: { value: "Welcome email for SaaS users." } });
     fireEvent.click(screen.getByRole("button", { name: /generate email/i }));
     await waitFor(() => expect(screen.getByText(/refine in chat/i)).toBeInTheDocument());
 
@@ -176,7 +189,7 @@ describe("AIEmailGeneratorApp", () => {
     );
 
     render(<App />);
-    fireEvent.change(screen.getByRole("textbox"), { target: { value: "Welcome email for SaaS users." } });
+    fireEvent.change(screen.getByLabelText(/email brief/i), { target: { value: "Welcome email for SaaS users." } });
     fireEvent.click(screen.getByRole("button", { name: /generate email/i }));
 
     await waitFor(() => expect(screen.getByText(/you’ve hit the free limit/i)).toBeInTheDocument());
@@ -199,7 +212,7 @@ describe("AIEmailGeneratorApp", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     render(<App />);
-    fireEvent.change(screen.getByRole("textbox"), { target: { value: "Welcome email for SaaS users." } });
+    fireEvent.change(screen.getByLabelText(/email brief/i), { target: { value: "Welcome email for SaaS users." } });
     fireEvent.click(screen.getByRole("button", { name: /generate email/i }));
     await waitFor(() => expect(screen.getByText(/preview unavailable/i)).toBeInTheDocument());
 
@@ -227,7 +240,7 @@ describe("AIEmailGeneratorApp", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     render(<App />);
-    fireEvent.change(screen.getByRole("textbox"), { target: { value: "Welcome email for SaaS users." } });
+    fireEvent.change(screen.getByLabelText(/email brief/i), { target: { value: "Welcome email for SaaS users." } });
     fireEvent.click(screen.getByRole("button", { name: /generate email/i }));
     await waitFor(() => expect(screen.getByText(/preview unavailable/i)).toBeInTheDocument());
 
@@ -250,7 +263,7 @@ describe("AIEmailGeneratorApp", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     render(<App />);
-    fireEvent.change(screen.getByRole("textbox"), { target: { value: "Welcome email for SaaS users." } });
+    fireEvent.change(screen.getByLabelText(/email brief/i), { target: { value: "Welcome email for SaaS users." } });
     fireEvent.click(screen.getByRole("button", { name: /generate email/i }));
     await waitFor(() => expect(screen.getByText(/preview unavailable/i)).toBeInTheDocument());
 
@@ -272,7 +285,7 @@ describe("AIEmailGeneratorApp", () => {
     );
 
     render(<App />);
-    fireEvent.change(screen.getByRole("textbox"), { target: { value: "Welcome email for SaaS users." } });
+    fireEvent.change(screen.getByLabelText(/email brief/i), { target: { value: "Welcome email for SaaS users." } });
     fireEvent.click(screen.getByRole("button", { name: /generate email/i }));
     await waitFor(() => expect(screen.getByText(/refine in chat/i)).toBeInTheDocument());
 
@@ -293,7 +306,7 @@ describe("AIEmailGeneratorApp", () => {
     );
 
     render(<App />);
-    fireEvent.change(screen.getByRole("textbox"), { target: { value: "Welcome email for SaaS users." } });
+    fireEvent.change(screen.getByLabelText(/email brief/i), { target: { value: "Welcome email for SaaS users." } });
     fireEvent.click(screen.getByRole("button", { name: /generate email/i }));
     await waitFor(() => expect(screen.getByText(/your draft is ready/i)).toBeInTheDocument());
 

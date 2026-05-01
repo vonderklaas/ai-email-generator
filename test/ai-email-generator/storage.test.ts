@@ -5,6 +5,8 @@ describe("draft storage", () => {
   it("persists and restores a valid draft", () => {
     persistDraft({
       prompt: "Welcome email for a SaaS product",
+      companyUrl: "https://example.com",
+      logoUrl: "https://example.com/logo.png",
       originalPrompt: "Welcome email for a SaaS product",
       currentEmail: {
         subject: "Welcome aboard",
@@ -15,7 +17,9 @@ describe("draft storage", () => {
       messages: [],
     });
 
-    expect(restoreDraft()?.currentEmail?.subject).toBe("Welcome aboard");
+    const restored = restoreDraft();
+    expect(restored?.currentEmail?.subject).toBe("Welcome aboard");
+    expect(restored?.companyUrl).toBe("https://example.com");
   });
 
   it("clears malformed draft data", () => {

@@ -18,7 +18,7 @@ describe("AIEmailGeneratorApp flow", () => {
     }));
 
     render(<AIEmailGeneratorApp />);
-    await user.type(screen.getByRole("textbox"), "Welcome email for a SaaS wiki app");
+    await user.type(screen.getByLabelText(/email brief/i), "Welcome email for a SaaS wiki app");
     await user.click(screen.getByRole("button", { name: /generate email/i }));
 
     await waitFor(() => {

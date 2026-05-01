@@ -3,6 +3,7 @@ import { compileMjmlSafe } from "@/lib/ai-email/mjml";
 import { generateEmail } from "@/lib/ai-email/openai";
 import { checkRateLimit, getClientIp } from "@/lib/ai-email/rateLimit";
 import { generateRequestSchema } from "@/lib/ai-email/schemas";
+import { fetchSiteContext, normalizePublicUrl } from "@/lib/ai-email/siteContext";
 import { errorResponse, jsonResponse } from "@/lib/ai-email/http";
 
 export const prerender = false;
@@ -24,7 +25,15 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   try {
-    const output = await generateEmail(parsed.data.prompt);
+    const siteContext = await fetchSiteContext(parsed.data.companyUrl || undefined);
+    const logoUrl = normalizePublicUrl(parsed.data.logoUrl || undefined)?.href ?? siteContext?.ogImage;
+    const output = await generateEmail(parsed.data.prompt, {
+      companyUrl: siteContext?.url ?? (parsed.data.companyUrl || undefined),
+      logoUrl,
+      title: siteContext?.title,
+      description: siteContext?.description,
+      themeColor: siteContext?.themeColor,
+    });
     const compiled = await compileMjmlSafe(output.mjml);
 
     return jsonResponse({

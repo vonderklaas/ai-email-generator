@@ -7,6 +7,13 @@ describe("aiEmailReducer", () => {
     expect(next.prompt).toBe("hello world");
   });
 
+  it("sets company and logo URLs", () => {
+    const withCompany = aiEmailReducer(initialState, { type: "setCompanyUrl", companyUrl: "https://acme.test" });
+    const withLogo = aiEmailReducer(withCompany, { type: "setLogoUrl", logoUrl: "https://acme.test/logo.png" });
+    expect(withLogo.companyUrl).toBe("https://acme.test");
+    expect(withLogo.logoUrl).toBe("https://acme.test/logo.png");
+  });
+
   it("transitions through generate success and seeds assistant message", () => {
     const started = aiEmailReducer(initialState, { type: "startGenerate" });
     expect(started.generating).toBe(true);
